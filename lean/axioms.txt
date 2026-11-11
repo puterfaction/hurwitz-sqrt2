@@ -1,0 +1,2 @@
+'hurwitzSqrt2' depends on axioms: [propext, Classical.choice, Quot.sound]
+'thmB' depends on axioms: [propext, Classical.choice, Quot.sound]

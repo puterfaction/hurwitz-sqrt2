@@ -1,0 +1,432 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[utf8]{inputenc}
+\usepackage{newunicodechar}
+% Unicode in the verbatim Lean excerpt (pdflatex); xelatex/lualatex with a Unicode mono font also works.
+\newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
+\newunicodechar{ℚ}{\ensuremath{\mathbb{Q}}}
+\newunicodechar{ℝ}{\ensuremath{\mathbb{R}}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{⊕}{\ensuremath{\oplus}}
+\newunicodechar{∑}{\ensuremath{\Sigma}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\ip}[1]{\langle #1\rangle}
+
+\title[The $N^{\sqrt2+o(1)}$ construction for Hurwitz's problem]{The $N^{\sqrt2+o(1)}$ construction for Hurwitz's problem,\\ written out in terms of bilinear forms}
+\author{Lindsay Debnath}
+\date{Version 1, 10 November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For every $N$ there are integer bilinear forms $f_1,g_1,\dots,f_K,g_K$ in $x_1,\dots,x_N,y_1,\dots,y_N$ with
+$h!\,(\sum_i x_i^2)(\sum_j y_j^2)=\sum_{k\le K} f_kg_k$ and $K=N^{\sqrt2+o(1)}$, where $h=O(\log^2N)$ is the least
+integer with at least $N$ partitions. This is a consequence of
+Theorem~B of the paper \emph{A $2^{o(n)}$ time algorithm for 3-SAT} \cite{ETH}, first pointed out in
+\cite{Sie}. This note restates the construction directly as an identity of bilinear forms, gives the coefficients
+explicitly, writes out the proofs of the two lemmas it rests on with the compressed steps filled in, and says
+exactly what is machine-checked. Nothing here is new mathematics beyond \cite{ETH}; the point is to make the
+construction checkable by a reader who works with polynomials rather than with the function language of \cite{ETH}.
+\end{abstract}
+
+\section{The result and its status}
+
+Write $p(E)$ for the number of partitions of $E$ ($p(0)=1$, $p(E)=0$ for $E<0$), $\cP_h$ for the set of
+partitions of $h$, and $B_F(N)$ for the least $s$ with $(\sum_{i\le N}x_i^2)(\sum_{j\le N}y_j^2)=\sum_{k\le s}f_kf'_k$,
+$f_k,f'_k$ bilinear over $F$ (the quantity $B_F(\mathrm{SOS}_N)$ of \cite{HWY}, and the bilinear-product variant (9) of \cite{Hru}).
+
+\begin{theorem}\label{thm:main}
+Let $h\ge1$ and $K_h=\sum_{j=0}^{2h}(4h-2j+1)\,p(j)$. There are bilinear forms $f_k,g_k$ ($k\le K_h$; some
+products $f_kg_k$ may vanish) in
+variables $x_\xi,y_\eta$ indexed by $\xi,\eta\in\cP_h$, with integer coefficients given explicitly in
+Section~\ref{sec:forms}, such that
+\[
+  h!\Big(\sum_{\xi\in\cP_h}x_\xi^2\Big)\Big(\sum_{\eta\in\cP_h}y_\eta^2\Big)=\sum_{k=1}^{K_h}f_kg_k .
+\]
+\end{theorem}
+
+Setting all but $N\le p(h)$ of the $x$'s and $y$'s to zero gives the identity for $N$ variables. Taking $h$ least
+with $p(h)\ge N$, the Hardy--Ramanujan asymptotics give $K_h=N^{\sqrt2+o(1)}$ (Section~\ref{sec:count}, for $N=2^\lambda$;
+for other $N$ use $2^{\lambda-1}<N\le2^\lambda$). Hence:
+
+\begin{corollary}\label{cor}
+$B_\Q(N)\le N^{\sqrt2+o(1)}$, and the same over any field of characteristic $0$ or larger than $h=O(\log^2N)$.
+By \cite[Remark~1.5]{HWY}, $\sigma_\C(N)\le 3B_\C(N)\le N^{\sqrt2+o(1)}$, where $\sigma_\C(N)$ is the least number of
+squares in Hurwitz's problem over $\C$.
+\end{corollary}
+
+The previous best upper bound is $N^{c+o(1)}$ with $c=1+2H(\alpha/2)\approx1.6147$, $H(\alpha)=\tfrac12$
+(\cite[Theorem~1 and its proof in \S4]{Hru}, stated there as $O(N^{c'})$ with $c'<1.62$; for the bilinear-product form (9)
+see \cite[\S5.1, Remark~18]{Hru}, and \cite[Theorem~12]{HruCCC} for a direct proof over every field). It
+also holds in positive characteristic, where the present identity says nothing ($h!=0$ once $p\le h$). The open problem
+in \cite[\S7]{Hru} asks whether $\sigma_\C(N)\le N^{1.5+o(1)}$ is attainable by parity representations; the bound
+here is below that target, by a different route.
+
+\begin{remark}[a consequence we have not checked beyond substitution]
+The proof of \cite[Theorem~25]{Hru} uses Theorem~1 there only as a black box, $\sigma(n)=O(n^{1+\delta})$,
+and obtains $\mathrm{size}^{(nc)}(\mathrm{ID}_n)\le n^{(3+\omega(3)+\delta)/4+o(1)}$. Substituting
+$\delta=\sqrt2-1$ and $\omega(3)<4.1997$ gives exponent below $1.904$ (instead of $1.954$), over fields of
+characteristic $0$.
+\end{remark}
+
+\paragraph{Status.} Theorem~B of \cite{ETH} is formalized in Lean~4 with Mathlib in \cite{FM} (commit
+\texttt{16a5ce41}): the statement file \texttt{eth/proof/statements/AppHalfPiecesStatement.lean} restates Appendix~B
+in the paper's words (definitions and statements only, about 240 lines, importing Mathlib and two short statement
+files), and \texttt{GeneralPieces.thmHalfPiecesPure} proves it. We rebuilt this from source
+(\texttt{lake exe cache get; lake build GeneralPieces.Main}) and checked
+\texttt{\#print axioms}: only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. We then stated
+Corollary~\ref{cor} (the bound over $\Q$, for $N$ a power of two) in terms of polynomials, in a file that imports Mathlib only
+(excerpt, inside \texttt{namespace HurwitzSqrt2} with \texttt{open MvPolynomial Finset}; docstrings omitted):
+{\footnotesize
+\begin{verbatim}
+abbrev Idx (lam : ℕ) : Type := Fin lam → Bool
+abbrev Var (lam : ℕ) : Type := Idx lam ⊕ Idx lam
+noncomputable def bil {lam : ℕ} (F : Idx lam → Idx lam → ℚ) : MvPolynomial (Var lam) ℚ :=
+  ∑ i, ∑ j, C (F i j) * X (Sum.inl i) * X (Sum.inr j)
+noncomputable def sos (lam : ℕ) : MvPolynomial (Var lam) ℚ :=
+  (∑ i, X (Sum.inl i) ^ 2) * (∑ j, X (Sum.inr j) ^ 2)
+def Statement : Prop :=
+  ∃ c : ℕ, ∀ lam : ℕ, 1 ≤ lam →
+    ∃ (K : ℕ) (f g : Fin K → Idx lam → Idx lam → ℚ),
+      (K : ℝ) ≤ (2 * lam : ℝ) ^ c * 2 ^ (Real.sqrt 2 * lam) ∧
+      sos lam = ∑ k, bil (f k) * bil (g k)
+\end{verbatim}
+}
+and proved \texttt{Statement} from \texttt{thmHalfPiecesPure} (file \texttt{HurwitzProof.lean}, 292 lines). That file
+restates the \texttt{HurwitzSqrt2} block rather than importing it; we diffed the two blocks and they are identical, and
+\texttt{\#print axioms hurwitzSqrt2} gives the same three axioms. The Lean statement has rational coefficients and does
+not contain the factor $h!$, integrality, or the exact count $K_h$ (its $K$ is
+$\sum_s2^{\lceil\log_2\min(R^{\rm row}_s,R^{\rm col}_s)\rceil}\le2K_h$); those are checked numerically for $h\le5$
+(Section~\ref{sec:map}) and follow from (54), (55).
+So the claim rests on Lean's kernel plus a reading of the definitions above and of Definition~7 as formalized
+(\texttt{Pieces.Family.Is} in \texttt{PiecesStatement.lean}, which matches the printed definition field by field,
+except the running-time clause of 7(c), which the bound does not need).
+The Lean development was written and reviewed by AI models; no person is known to have read its proofs.
+Section~\ref{sec:map} maps each step below to its Lean declaration.
+
+\section{The construction}\label{sec:construction}
+
+\subsection{The Fock space}
+Let $V=\Q[t_1,t_2,\dots]$, with $t_k$ of weight $k$; the monomials $t^\mu=\prod_it_{\mu_i}$, $\mu$ a partition,
+form a basis, and $V_E$ (weight $E$) has dimension $p(E)$. For $k\ge1$ let
+\[\nabla_{-k}=t_k\cdot,\qquad \nabla_k=k\,\partial/\partial t_k,\qquad\text{so}\quad[\nabla_k,\nabla_{-l}]=k\,\delta_{kl}.\]
+These are the Heisenberg relations; $V$ is the Fock representation. $\nabla_k$ maps $V_E\to V_{E-k}$ for all $k\ne0$.
+For $\sigma,\sigma'$ partitions and an operator $T$, write $[t^{\sigma'}]\,T\,t^\sigma$ for the matrix entry.
+
+\subsection{The operators $a[r]$}
+For a monomial $a=t^\mu$ with parts $\mu_1,\dots,\mu_n$ (listed with multiplicity) and $r\in\Z$, put
+\begin{equation}\tag{47}
+a[r]=\sum_{\substack{k_1,\dots,k_n\in\Z\setminus\{0\}\\ k_1+\dots+k_n=-r}}\;\prod_i\binom{-k_i-1}{\mu_i-1}\;
+\prod_{i:k_i<0}\nabla_{k_i}\prod_{i:k_i>0}\nabla_{k_i},
+\end{equation}
+with all differentiations ($k_i>0$) applied first, and extend linearly in $a$. Here
+$\binom{k}{j}=k(k-1)\cdots(k-j+1)/j!$ for all integers $k$. On $V_E$ only finitely many terms are nonzero (the
+positive $k_i$ add up to at most $E$), and $a[r]$ maps $V_E$ into $V_{E+r}$, with integer matrix entries if $a$ has
+integer coefficients. For example $t_1[r]=\nabla_{-r}$ ($r\neq0$). With $Y(a,\omega)=\sum_ra[r]\,\omega^{r-|\mu|}$, these are the
+coefficients of the fields of the Heisenberg vertex algebra \cite[\S2.3, (4)]{Fre}, as \cite[App.~H]{ETH} notes; we do
+not use this except in Remark~\ref{rem:locality}.
+
+\subsection{The operators $Q_s$}
+Let $h\ge1$, $b\in V_h$, and $a=\sum_{h'=0}^h\bar a_{h'}$ with $\bar a_{h'}\in V_{h'}$. Put
+$a^{\langle i\rangle}=\sum_{h'}\binom{h'+h}{i}\bar a_{h'}$ and, for $s\in\Z$,
+\begin{equation}\tag{48}
+Q_s(a,b)=\sum_{i=0}^{2h}(-1)^i\,a^{\langle i\rangle}[s-h+i]\;b[h-s-i],\qquad
+Q'_s(a,b)=\sum_{i=0}^{2h}(-1)^i\,b[h-s-i]\;a^{\langle i\rangle}[s-h+i].
+\end{equation}
+Both preserve weight. The weighting $a^{\langle i\rangle}$ makes $Q_s$ linear in $a$ while each homogeneous component
+$\bar a_{h'}$ is paired with its own binomial row $\binom{h'+h}{i}$; this is what lets the proof below handle
+inhomogeneous $a$ one component at a time.
+
+\begin{lemma}[Lemma 9 of \cite{ETH}]\label{lem:Q}
+On $V_E$, for every $E\ge0$:
+(a) $Q_s(a,b)=Q'_s(a,b)$;
+(b) $Q_s(a,b)=0$ for $|s|>E+h$;
+(c) $\sum_{|s|\le E+h}Q_s(a,b)=(a[-h]b)\cdot\mathrm{Id}$, where $a[-h]b\in V_0=\Q$.
+\end{lemma}
+
+\subsection{Dual families}
+For $n\ge1$ let $y_n=\sum_{j=1}^n\binom nj t_j$ (no relation to the variables $y_\eta$ of Theorem~\ref{thm:main}), and for $\mu\in\cP_h$
+\[a^\mu=\prod_i(-1)^{\mu_i-1}y_{\mu_i},\qquad b^\mu=\frac{h!}{z_\mu}\,t^\mu,\qquad z_\mu=\prod_kk^{m_k(\mu)}m_k(\mu)!,\]
+where $m_k(\mu)$ is the number of parts equal to $k$; $h!/z_\mu\in\Z$ is the number of permutations of cycle type $\mu$.
+$a^\mu$ has integer coefficients and only monomials of weight $\le h$.
+
+\begin{lemma}[Lemma 10 of \cite{ETH}]\label{lem:dual}
+$a^\mu[-h]\,b^\nu=h!\,\delta_{\mu\nu}$ for all $\mu,\nu\in\cP_h$.
+\end{lemma}
+
+\subsection{The identity}
+For $\xi,\eta,\upsilon,\nu\in\cP_h$ and $|s|\le2h$ let
+\begin{equation}\tag{53}
+A_s(\xi,\eta,\upsilon,\nu)=[t^\upsilon]\;Q_s(a^\xi,b^\nu)\;t^\eta .
+\end{equation}
+By Lemma~\ref{lem:Q}(b),(c) with $E=h$ and Lemma~\ref{lem:dual},
+\begin{equation}\label{eq:cross}
+\sum_{|s|\le2h}A_s(\xi,\eta,\upsilon,\nu)=h!\,\delta_{\xi\nu}\,\delta_{\eta\upsilon}.
+\end{equation}
+Equivalently, the degree-four polynomial $\sum_s\sum A_s(\xi,\eta,\upsilon,\nu)\,x_\xi y_\eta x_\nu y_\upsilon$ equals
+$h!(\sum x_\xi^2)(\sum y_\eta^2)$, already at the level of coefficient tensors (so also for the non-commutative
+$\mathrm{ID}$ polynomial of \cite{HWY}, with $(\xi,\eta,\nu,\upsilon)$ in the positions $X,Y,X,Y$). What remains is to
+write each tensor $A_s$ as a short sum of products of two matrices, splitting the indices as $(\xi,\upsilon)\,|\,(\nu,\eta)$
+or as $(\xi,\eta)\,|\,(\nu,\upsilon)$; commutatively, each such product is a product of two bilinear forms. (These two
+splittings are forms (b) and (a) of \cite[Lemma~3.5]{HWY}, which matters for the non-commutative width of
+$h!\,\mathrm{ID}_N$; Theorem~\ref{thm:main} itself does not need that lemma.)
+
+\section{The bilinear forms}\label{sec:forms}
+
+Define integer matrices (rows and columns indexed by partitions) for each $\xi,\nu\in\cP_h$:
+\[
+\alpha^{(i)}_r[\xi]_{\sigma'\sigma}=(-1)^i\,[t^{\sigma'}]\;(a^\xi)^{\langle i\rangle}[r]\;t^\sigma,\qquad
+\beta_r[\nu]_{\sigma'\sigma}=[t^{\sigma'}]\;b^\nu[r]\;t^\sigma .
+\]
+Inserting $\mathrm{Id}=\sum_\sigma t^\sigma[t^\sigma]$ on the middle weight space in (48) gives two factorizations.
+
+\emph{Column-wise} (directly from $Q_s$; display (55) of \cite{ETH}): $b[h-s-i]\,t^\eta\in V_{2h-s-i}$, so
+\[
+A_s(\xi,\eta,\upsilon,\nu)=\sum_{i=0}^{2h}\sum_{\sigma\in\cP_{2h-s-i}}\alpha^{(i)}_{s-h+i}[\xi]_{\upsilon\sigma}\;\beta_{h-s-i}[\nu]_{\sigma\eta},
+\]
+and each term $(i,\sigma)$ gives the pair
+\[
+f_{s,i,\sigma}=\sum_{\xi,\upsilon}\alpha^{(i)}_{s-h+i}[\xi]_{\upsilon\sigma}\,x_\xi y_\upsilon,\qquad
+g_{s,i,\sigma}=\sum_{\nu,\eta}\beta_{h-s-i}[\nu]_{\sigma\eta}\,x_\nu y_\eta .
+\]
+
+\emph{Row-wise} (from $Q'_s$, so it uses Lemma~\ref{lem:Q}(a); display (54)): $a^{\langle i\rangle}[s-h+i]\,t^\eta\in V_{s+i}$, so
+\[
+A_s(\xi,\eta,\upsilon,\nu)=\sum_{i=0}^{2h}\sum_{\sigma\in\cP_{s+i}}\alpha^{(i)}_{s-h+i}[\xi]_{\sigma\eta}\;\beta_{h-s-i}[\nu]_{\upsilon\sigma},
+\]
+\[
+f_{s,i,\sigma}=\sum_{\xi,\eta}\alpha^{(i)}_{s-h+i}[\xi]_{\sigma\eta}\,x_\xi y_\eta,\qquad
+g_{s,i,\sigma}=\sum_{\nu,\upsilon}\beta_{h-s-i}[\nu]_{\upsilon\sigma}\,x_\nu y_\upsilon .
+\]
+
+In both cases $f_{s,i,\sigma}g_{s,i,\sigma}$, summed over the terms, has coefficient $A_s(\xi,\eta,\upsilon,\nu)$ on
+$x_\xi y_\eta x_\nu y_\upsilon$, so by \eqref{eq:cross} the sum over $s$ is $h!(\sum x^2)(\sum y^2)$.
+
+\paragraph{Which way for which $s$.} The numbers of terms are $R^{\rm row}_s=\sum_{i=0}^{2h}p(s+i)$ and
+$R^{\rm col}_s=\sum_{i=0}^{2h}p(2h-s-i)$. Substituting $i\mapsto 2h-i$ shows $R^{\rm col}_s=R^{\rm row}_{-s}$, and
+$R^{\rm row}_s$ is nondecreasing in $s$. So the column-wise form is at least as short for $s\ge0$ and the row-wise
+form for $s\le0$, and
+\[
+\min(R^{\rm row}_s,R^{\rm col}_s)=\sum_{j=0}^{2h-|s|}p(j),\qquad
+K_h=\sum_{|s|\le2h}\ \sum_{j=0}^{2h-|s|}p(j)=\sum_{j=0}^{2h}(4h-2j+1)\,p(j).
+\]
+This proves Theorem~\ref{thm:main}, given Lemmas~\ref{lem:Q} and~\ref{lem:dual}. Note that Lemma~\ref{lem:Q}(a)
+is used only for $s<0$. The intuition: both factors of a term pass through one weight space, of weight $2h-s-i$
+or $s+i$; choosing the side that keeps it at most $2h-|s|$ keeps its dimension at most $p(2h)\approx p(h)^{\sqrt2}$.
+
+\section{Proofs of the lemmas}\label{sec:proofs}
+
+\begin{proof}[Proof of Lemma~\ref{lem:dual}]
+For $b\in V_h$ and a monomial $a$, in $a[-h]b$ only terms of (47) with all $k_i>0$ survive: if some $k_i<0$, the
+positive ones add up to more than $h$ and the differentiations kill $b$. Expand $\prod_iy_{\mu_i}=\sum_{j}\prod_i\binom{\mu_i}{j_i}t_{j_i}$
+($1\le j_i\le\mu_i$) and apply (47) to each monomial, listing its parts as $j_1,\dots,j_n$:
+\[
+\Big(\prod_iy_{\mu_i}\Big)[-h]\,b=\sum_{\substack{k_i\ge1\\ \sum k_i=h}}\prod_i\vartheta_{\mu_i}(k_i)\prod_i\nabla_{k_i}b,\qquad
+\vartheta_n(k)=\sum_{j=1}^n\binom{n}{n-j}\binom{-k-1}{j-1}=\binom{n-k-1}{n-1}
+\]
+by Vandermonde's identity (valid for all integer upper indices). For $1\le k<n$, $0\le n-k-1<n-1$ and $\vartheta_n(k)=0$;
+$\vartheta_n(n)=\binom{-1}{n-1}=(-1)^{n-1}$. So a nonzero term has $k_i\ge\mu_i$ for all $i$; as both sides add up to $h$,
+$k_i=\mu_i$. The signs cancel those in $a^\mu$, so $a^\mu[-h]b=\prod_i\nabla_{\mu_i}b$. For $b=t^\nu$,
+$\prod_i\mu_i\partial_{t_{\mu_i}}t^\nu$ is zero unless $\mu\subseteq\nu$ as multisets, i.e.\ $\mu=\nu$, and then
+equals $z_\mu$. Hence $a^\mu[-h]b^\nu=\frac{h!}{z_\nu}z_\mu\delta_{\mu\nu}=h!\,\delta_{\mu\nu}$.
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:Q}]
+All three statements are linear in $a$ and $b$ (since $a^{\langle i\rangle}$ is linear in $a$), so it suffices to
+treat monomials. Let $a=t^\mu$, $|\mu|=h'\le h$, $b=t^\nu$, $|\nu|=h$, and put $H=h'+h$; then
+$a^{\langle i\rangle}=\binom Hi a$. The terms of (48) with $i>H$ vanish, so (48) is a sum over $0\le i\le H$, which is
+what the expansion of $(\omega_1-\omega_2)^H$ below produces.
+
+\emph{Rings.} Let $\cL=\Q[\omega_1^{\pm1},\omega_2^{\pm1}]$; $\cL^+$ the formal series $\sum_{j\ge j_0}q_j(\omega_1)\omega_2^j$ with
+$q_j\in\Q[\omega_1^{\pm1}]$, and $\cL^-$ the same with $\omega_1,\omega_2$ exchanged. In $\cL^\pm$, $\omega_1-\omega_2$ has
+the inverse $\varepsilon_+=\sum_{m\ge0}\omega_1^{-m-1}\omega_2^m$, resp.\ $\varepsilon_-=-\sum_{m\ge0}\omega_2^{-m-1}\omega_1^m$.
+From $(\omega_1-\omega_2)\varepsilon_\pm=1$: $\partial_{\omega_1}\varepsilon_\pm=-\varepsilon_\pm^2$, $\partial_{\omega_2}\varepsilon_\pm=\varepsilon_\pm^2$.
+Hence $\partial_{\omega_2}^{n-1}\varepsilon^2=n!\,\varepsilon^{n+1}$ and
+\begin{equation}\tag{49}
+\frac{1}{(j-1)!(n-1)!}\,\partial_{\omega_1}^{j-1}\partial_{\omega_2}^{n-1}\varepsilon_\pm^2=\Gamma_{j,n}\,\varepsilon_\pm^{j+n},\qquad
+\Gamma_{j,n}=(-1)^{j-1}\frac{(j+n-1)!}{(j-1)!\,(n-1)!},
+\end{equation}
+the same number for both signs.
+
+\emph{Generating functions.} For $n\ge1$ let
+\[J^+_n(\omega)=\sum_{l\ge1}\binom{l-1}{n-1}\nabla_{-l}\,\omega^{l-n},\qquad
+J^-_n(\omega)=\sum_{k\ge1}\binom{-k-1}{n-1}\nabla_k\,\omega^{-k-n}.\]
+Reading (47) with $k_i=-l_i<0$ for $i$ in a set $S$ of parts and $k_i>0$ otherwise,
+\[Y(t^\mu,\omega):=\sum_r t^\mu[r]\,\omega^{r-h'}=\sum_{S}\prod_{i\in S}J^+_{\mu_i}(\omega)\prod_{i\notin S}J^-_{\mu_i}(\omega),\]
+creation operators to the left. Take commuting indeterminates $z_n,z'_n$ ($n\ge1$),
+$A^\pm=\sum_nz_nJ^\pm_n(\omega_1)$, $B^\pm=\sum_nz'_nJ^\pm_n(\omega_2)$. The $J^+$'s commute with each other, as do the
+$J^-$'s, so expanding the exponentials and collecting $z^\mu=\prod z_{\mu_i}$,
+\[e^{A^+}e^{A^-}=\sum_\mu \frac{z^\mu}{\mu!}\,Y(t^\mu,\omega_1),\qquad \mu!=\prod_km_k(\mu)!,\]
+because the coefficient of $z^\mu$ collects the terms with $\alpha_n+\beta_n=m_n(\mu)$ factors $J^+_n$, $J^-_n$;
+and $1/(\alpha_n!\beta_n!)=\binom{m_n}{\alpha_n}/m_n!$, where $\binom{m_n}{\alpha_n}$ counts the ways to choose which
+$\alpha_n$ of the $m_n$ parts equal to $n$ lie in $S$. Likewise for $B^\pm$ with $\omega_2$.
+
+\emph{Commuting the middle factors.} $B^+$ is multiplication by $\sum_kB_kt_k$, $B_k=\sum_nz'_n\binom{k-1}{n-1}\omega_2^{k-n}$,
+and $A^-=\sum_kA_k\nabla_k$, $A_k=\sum_jz_j\binom{-k-1}{j-1}\omega_1^{-k-j}$. By Taylor's formula, on the coefficient of each power of $\omega_2$,
+$e^{A^-}$ acts as the ring homomorphism $t_k\mapsto t_k+kA_k$, so
+$e^{A^-}e^{B^+}=e^{\kappa}e^{B^+}e^{A^-}$ with
+\[
+\kappa=\sum_kkA_kB_k=\sum_{j,n}z_jz'_n\sum_{k\ge1}k\binom{-k-1}{j-1}\binom{k-1}{n-1}\omega_1^{-k-j}\omega_2^{k-n}
+=\sum_{j,n}z_jz'_n\,\Gamma_{j,n}\,\varepsilon_+^{j+n}\quad\text{in }\cL^+,
+\]
+since the inner sum is the left side of (49) applied to $\varepsilon_+^2=\partial_{\omega_2}\varepsilon_+=\sum_kk\,\omega_1^{-k-1}\omega_2^{k-1}$.
+In the same way $e^{B^-}e^{A^+}=e^{\kappa'}e^{A^+}e^{B^-}$ in $\cL^-$, $\kappa'=\sum z_jz'_n\Gamma_{j,n}\varepsilon_-^{j+n}$
+(now using $\varepsilon_-^2=-\partial_{\omega_1}\varepsilon_-=\sum_kk\,\omega_2^{-k-1}\omega_1^{k-1}$). With the fully
+normal-ordered $\mathcal N=e^{A^+}e^{B^+}e^{A^-}e^{B^-}$ (multiplications commute, and so do differentiations):
+\begin{equation}\tag{51}
+e^{A^+}e^{A^-}e^{B^+}e^{B^-}=e^{\kappa}\mathcal N\ \text{in }\cL^+,\qquad e^{B^+}e^{B^-}e^{A^+}e^{A^-}=e^{\kappa'}\mathcal N\ \text{in }\cL^-.
+\end{equation}
+\emph{In which ring these identities hold.} Each side of (51), and of the two commutation rules before it, is a
+formal power series in the $z_n,z'_n$ whose coefficients are $\mathrm{End}(V)$-valued formal series in
+$\omega_1^{\pm1},\omega_2^{\pm1}$. Such a product is read as follows: fix a monomial in the $z,z'$, a power of
+$\omega_2$ (resp.\ of $\omega_1$), and two monomials $t^\sigma,t^{\sigma'}$; then $[t^\sigma](\cdots)\,t^{\sigma'}$ is a
+finite sum of Laurent monomials in the other variable, and an identity means that these finite sums agree for every
+such choice. The finiteness is the argument of \cite[App.~B]{ETH}. In every product here $e^{A^+}$ stands left of
+$e^{A^-}$ and $e^{B^+}$ left of $e^{B^-}$. If moreover $e^{B^-}$ does not stand left of $e^{A^+}$, the result lies in
+$\cL^+$: (i) the differentiations from $B^-$ are applied before all multiplications, so their indices add up to at most
+$|\sigma'|$; (ii) the $\omega_2$-exponent of a term $z'_n\nabla_{-k}$ of $B^+$ is $k-n\ge0$ and grows with $k$, while
+those from $B^-$ are bounded by (i), so a fixed power of $\omega_2$ leaves finitely many choices for the
+multiplications from $B^+$; (iii) with the $z$-monomial and all weights now bounded, the indices from $A^\pm$ are
+bounded too. The $\omega_2$-exponents are bounded below, so the coefficient lies in $\cL^+$. Likewise the result lies
+in $\cL^-$ (with $\omega_1,\omega_2$ exchanged) if $e^{A^-}$ does not stand left of $e^{B^+}$. In particular
+$\kappa$, $e^\kappa$ and both sides of the first identity in (51) are in $\cL^+$, and $\kappa'$ and the second identity
+in $\cL^-$.
+
+\emph{One Laurent polynomial.} Fix $\sigma,\sigma'\in\cP_E$ and write $\ip X=[t^\sigma]X\,t^{\sigma'}$. Every coefficient
+$n_{\mu'',\nu''}$ of $z^{\mu''}z'^{\nu''}$ in $\ip{\mathcal N}$ is in $\cL$ (only $\nabla_k$ with $|k|\le E$ contribute between
+two weight-$E$ states), and $n_{\emptyset,\emptyset}=\delta_{\sigma\sigma'}$. The coefficient of $z^{\mu'}z'^{\nu'}$ in $e^\kappa$
+is $\Gamma_{\mu',\nu'}\varepsilon_+^{|\mu'|+|\nu'|}$ for a number $\Gamma_{\mu',\nu'}$ (each $z_jz'_n$ carries $\varepsilon^{j+n}$), and in
+$e^{\kappa'}$ it is $\Gamma_{\mu',\nu'}\varepsilon_-^{|\mu'|+|\nu'|}$. Comparing coefficients of $z^\mu z'^\nu$ in (51):
+\[
+f_\pm:=\ip{Y(a,\omega_1)Y(b,\omega_2)}\ \text{resp.}\ \ip{Y(b,\omega_2)Y(a,\omega_1)}
+=\mu!\,\nu!\sum\Gamma_{\mu',\nu'}\,\varepsilon_\pm^{|\mu'|+|\nu'|}\,n_{\mu'',\nu''},
+\]
+summed over splittings $\mu=\mu'\sqcup\mu''$, $\nu=\nu'\sqcup\nu''$. Since $|\mu'|+|\nu'|\le H$, multiplying by
+$(\omega_1-\omega_2)^H$ gives in both cases the same Laurent polynomial
+$F=\mu!\nu!\sum\Gamma_{\mu',\nu'}(\omega_1-\omega_2)^{H-|\mu'|-|\nu'|}n_{\mu'',\nu''}\in\cL$, with
+$F(1,1)=\mu!\nu!\,\Gamma_{\mu,\nu}\,\delta_{\sigma\sigma'}$ (every other term has a factor $\omega_1-\omega_2$).
+
+\emph{Reading off.} Only weight-preserving products contribute to $\ip\cdot$, so
+\[f_+=\sum_r\ip{a[r]b[-r]}\,\omega_1^{r-h'}\omega_2^{-r-h},\qquad f_-=\sum_r\ip{b[-r]a[r]}\,\omega_1^{r-h'}\omega_2^{-r-h},\]
+with no terms for $r>E$ in $f_+$ ($b[-r]t^{\sigma'}\in V_{E-r}$) and none for $r<-E$ in $f_-$. Multiplying by
+$(\omega_1-\omega_2)^H=\sum_i(-1)^i\binom Hi\omega_1^{H-i}\omega_2^i$ and collecting
+$\omega_1^s\omega_2^{-s}$ ($r=s-h+i$):
+\[F=\sum_sF_s\,\omega_1^s\omega_2^{-s},\qquad F_s=\ip{Q_s(a,b)}=\ip{Q'_s(a,b)}.\]
+This is (a). For $s>E+h$, every $r=s-h+i\ge s-h>E$, so all terms of the first form vanish; for $s<-E-h$, every
+$r=s-h+i\le s-h+H=s+h'<-E$, so all terms of the second form vanish ($a[r]t^{\sigma'}\in V_{E+r}=0$). This is (b).
+Finally $\sum_sF_s=F(1,1)=\mu!\nu!\Gamma_{\mu,\nu}\delta_{\sigma\sigma'}$, and $\Gamma_{\mu,\nu}$ does not depend on $E$.
+To identify it take $E=0$: then $\ip{\mathcal N}=1$ (the differentiations kill $1$, and the constant term of
+$e^{A^+}e^{B^+}1$ is $1$), so $f_+=\mu!\nu!\Gamma_{\mu,\nu}\varepsilon_+^H$, whose coefficient of $\omega_2^0$ is
+$\mu!\nu!\Gamma_{\mu,\nu}\,\omega_1^{-H}$. In $f_+=\sum_r\ip{a[r]b[-r]}\omega_1^{r-h'}\omega_2^{-r-h}$ the $\omega_2^0$ term is
+$r=-h$, i.e.\ $a[-h]\,(b[h]1)\,\omega_1^{-H}$. And $b[h]1=b$: on $1$ only terms of (47) with all $k_i=-l_i<0$ survive,
+$\sum l_i=h=\sum\nu_i$, and $\binom{l_i-1}{\nu_i-1}=0$ for $l_i<\nu_i$, so $l_i=\nu_i$ and the term is $t^\nu$. Hence
+$\mu!\nu!\Gamma_{\mu,\nu}=a[-h]b$, which is (c).
+\end{proof}
+
+\begin{remark}\label{rem:locality}
+For homogeneous $a$, (a) is the coefficient form of locality of the fields $Y(a,\omega_1),Y(b,\omega_2)$ of the
+Heisenberg vertex algebra, $(\omega_1-\omega_2)^H[Y(a,\omega_1),Y(b,\omega_2)]=0$ \cite[\S2.1 and Prop.~2.4]{Fre},
+\cite[Def.~1.5.1]{MN}, restricted to the weight-preserving products, as \cite[App.~H]{ETH} observes. A reader who
+knows that theory can take (a) for homogeneous $a$ from it. It does not by itself give (b), (c), or the bookkeeping
+for inhomogeneous $a$ through $a^{\langle i\rangle}$; those are proved above directly, and they are what the identity
+\eqref{eq:cross} needs.
+\end{remark}
+
+\section{Counting}\label{sec:count}
+Let $\kappa_{\rm HR}=\pi\sqrt{2/3}/\ln2\approx3.70$. By Hardy--Ramanujan, $\kappa_{\rm HR}\sqrt E-\log_2E-C\le\log_2p(E)\le\kappa_{\rm HR}\sqrt E+C$
+(the form used in \cite[(46)]{ETH}). For $N=2^\lambda$ and $h$ least with $p(h)\ge N$: $p(h-1)<2^\lambda$ gives
+$\kappa_{\rm HR}\sqrt h\le\lambda+O(\log\lambda)$ and $h=O(\lambda^2)$. Since $p$ is nondecreasing,
+$K_h\le(2h+1)(4h+1)\,p(2h)$, and $\log_2p(2h)\le\sqrt2\,\kappa_{\rm HR}\sqrt h+C\le\sqrt2\,\lambda+O(\log\lambda)$. So
+$K_h\le N^{\sqrt2}(\log N)^{O(1)}$. Exact values (computed by \texttt{check\_lemmas.py}):
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$\lambda$ & $h$ & $\log_2K_h$ & $\log_2K_h/\lambda$\\
+\midrule
+10 & 23 & 22.7 & 2.272\\
+20 & 61 & 38.4 & 1.922\\
+40 & 186 & 68.9 & 1.723\\
+60 & 372 & 98.5 & 1.641\\
+70 & 489 & 113.2 & 1.618\\
+80 & 620 & 127.8 & 1.598\\
+100 & 927 & 156.9 & 1.569\\
+200 & 3361 & 300.9 & 1.505\\
+400 & 12663 & 586.4 & 1.466\\
+600 & 27849 & 870.9 & 1.451\\
+\bottomrule
+\end{tabular}
+\end{center}
+The exponent first drops below $1.6147$ at $\lambda=72$, and approaches $\sqrt2$ only like $\log\lambda/\lambda$. For small $N$
+the identity uses far more than $N^2$ products ($K_4=307$ for $N\le5$, $K_5=707$ for $N\le7$): it is purely asymptotic.
+
+\section{What is checked, and where}\label{sec:map}
+
+{\footnotesize\raggedright
+\noindent\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Step & Lean declaration (paths relative to \texttt{eth/proof/rates/GeneralPieces/}; those beginning \texttt{statements/} or \texttt{rates/} are relative to \texttt{eth/proof/}) \\
+\midrule
+Definition 7, Theorem B (statements) & \texttt{Pieces.Family.Is} (\texttt{statements/PiecesStatement.lean}); \texttt{AppHalfPieces.ThmHalfPiecesPure}, \texttt{LemmaQ}, \texttt{LemmaDual}, \texttt{PieceFacts} (\texttt{statements/AppHalfPiecesStatement.lean})\\
+(47): finiteness, linearity; (O1) & \texttt{GeneralPieces.opFacts} (\texttt{Ring/OpFacts.lean}); \texttt{GeneralPieces.o1} (\texttt{Ring/Op.lean})\\
+(51), the two orders & \texttt{GeneralPieces.GenF.stTwoOrders} (\texttt{GenF/Commute.lean}); \texttt{GeneralPieces.GenF.stExpansion} (\texttt{GenF/Main.lean})\\
+One Laurent polynomial $F$; $F(1,1)$; the constant & \texttt{Expansion.dW\_pow\_mul\_fP}, \texttt{Expansion.dW\_pow\_mul\_fM}, \texttt{Expansion.ev\_F} (\texttt{Series/OneLaurent.lean}); \texttt{Expansion.const} (\texttt{Series/Constant.lean}), all in \texttt{GeneralPieces.Series}\\
+Lemma \ref{lem:Q} (a), (b), (c) & \texttt{GeneralPieces.Series.Qk\_eq\_Qk'\_of}, \texttt{Qk\_eq\_zero\_of}, \texttt{sum\_Qk\_of} (\texttt{Series/LemmaQ.lean}); assembled as \texttt{GeneralPieces.lemmaQ} (\texttt{Ring/LemmaQ.lean}) via \texttt{GeneralPieces.stBridge} (\texttt{Ring/Bridge.lean})\\
+Lemma \ref{lem:dual}; $h!/z_\mu\in\Z$ & \texttt{GeneralPieces.Dual.lemmaDual}, with \texttt{theta\_eq}, \texttt{theta\_of\_lt}, \texttt{theta\_self}; \texttt{GeneralPieces.Dual.zDvd} (\texttt{Ring/Dual.lean})\\
+\eqref{eq:cross}, (54), (55), integrality & \texttt{GeneralPieces.pieceFacts} (\texttt{Ring/Pieces.lean}); per piece \texttt{GeneralPieces.ThmHalfPieces.sum\_A}, \texttt{row\_A}, \texttt{col\_A} (\texttt{Ring/ThmHalfPieces.lean})\\
+Counting, $h=O(\lambda^2)$ & \texttt{GeneralPieces.Bits.exists\_bits\_le}, \texttt{exists\_hOf\_le} (\texttt{Ring/Bits.lean}), which take (46) as a hypothesis; (46), with $B\log_2E$ in place of $\log_2E$, is \texttt{ClauseBound.Part.exists\_bounds} (\texttt{rates/ClauseBound/Part/Bounds.lean}), used in \texttt{thmHalfPiecesPure}\\
+Theorem B & \texttt{GeneralPieces.thmHalfPiecesPure} (\texttt{Ring/ThmHalfPieces.lean}), applied to \texttt{AppHalfPieces.pieceFacts} (\texttt{Main.lean})\\
+Corollary \ref{cor}, bound form over $\Q$, $N=2^\lambda$ & \texttt{hurwitzSqrt2} (our \texttt{HurwitzProof.lean})\\
+\bottomrule
+\end{tabularx}\par}
+\medskip
+
+\paragraph{Independent numerical checks.} \texttt{check\_lemmas.py} (Python, exact integer arithmetic, written
+from the paper's text, not from \cite{Sie} or the Lean code) implements (47), (48), $a^\mu$, $b^\mu$ and checks:
+the Heisenberg relations; Lemma~\ref{lem:dual} for all $\mu,\nu\in\cP_h$, $h\le5$; Lemma~\ref{lem:Q}(a), (b), (c) for
+$a=a^\mu$ (inhomogeneous), $b=b^\nu$, $h\le4$, on every basis monomial of $V_E$, $E\le4$, for $|s|\le2(E+h)+2$ (for
+$s>E+h$ the vanishing of $Q_s$ is immediate, but for $s<-(E+h)$, and for $Q'_s$ with $s>E+h$, it is a real cancellation;
+the lemma for general $a,b$ is not tested numerically);
+\eqref{eq:cross} on all $p(h)^4$ index tuples for $h\le5$; both factorizations term by term for $h\le4$; and the identity of
+Theorem~\ref{thm:main}, multiplied out as a polynomial in $2p(h)$ variables, for $h=2,\dots,5$ ($K_h=40,120,307,707$).
+All 44 checks pass (about 160 seconds on a laptop). \cite{Sie} reports the same identity checked for $N=4$ and $N=8$ with a different implementation; we reproduced its $N=4$ case here.
+
+\paragraph{Credit and provenance.} The observation that Theorem~B of \cite{ETH} gives $N^{\sqrt2+o(1)}$ for
+Hurwitz's problem was published first by J.~P.~Siemaszko on 7 November 2026 \cite{Sie}, including the translation
+to \cite[Lemma~3.5]{HWY} and instance checks. The construction and the proofs above are those of \cite{ETH}, re-presented. This note, its
+Lean bridge and its scripts were produced with Claude models (Anthropic) in sessions directed by the author, who
+has not verified the mathematics independently of the checks described.
+
+\begin{thebibliography}{9}
+\bibitem{ETH} Claude (Anthropic), \emph{A $2^{o(n)}$ time algorithm for 3-SAT}, 26 Oct 2026, \url{https://github.com/anthropics/formal-math/tree/main/eth}.
+\bibitem{FM} \texttt{anthropics/formal-math}, \texttt{eth/}, commit \texttt{16a5ce41304fcdaea4e0be7c132e1c361dc26da5}.
+\bibitem{Fre} E.~Frenkel, \emph{Vertex algebras and algebraic curves}, S\'eminaire Bourbaki 1999/2000, expos\'e 875, Ast\'erisque 276 (2002), 299--339; arXiv:math/0007054 (numbering cited from this version, as in \cite{ETH}).
+\bibitem{Hru} P.~Hrube\v{s}, \emph{A subquadratic upper bound on Hurwitz's problem and related non-commutative polynomials}, ECCC TR24-099, 2024.
+\bibitem{HruCCC} P.~Hrube\v{s}, \emph{A subquadratic upper bound on sum-of-squares composition formulas}, CCC 2024, LIPIcs 300, 12:1--12:11; ECCC TR24-026 (theorem numbering as cited in \cite[App.~G]{ETH}).
+\bibitem{HWY} P.~Hrube\v{s}, A.~Wigderson, A.~Yehudayoff, \emph{Non-commutative circuits and the sum-of-squares problem}, J. Amer. Math. Soc. 24 (2011); ECCC TR10-021.
+\bibitem{MN} A.~Matsuo, K.~Nagatomo, \emph{Axioms for a vertex algebra and the locality of quantum fields}, MSJ Memoirs 4, 1999.
+\bibitem{Sie} J.~P.~Siemaszko, \emph{An $N^{\sqrt2+o(1)}$ upper bound for Hurwitz's sum-of-squares problem from the ETH-refutation construction}, v0.5, Nov 2026, DOI 10.5281/zenodo.24024689.
+\end{thebibliography}
+
+\end{document}

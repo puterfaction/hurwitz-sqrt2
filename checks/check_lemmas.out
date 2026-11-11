@@ -1,0 +1,62 @@
+[PASS] Heisenberg relation nabla_k nabla_{-l} - nabla_{-l} nabla_k = k[k=l]  (k,l<=4, E<=4)
+[PASS] Lemma 10, h=1: a^mu[-h] b^nu = h![mu=nu] for all 1^2 pairs
+[PASS] Lemma 10, h=2: a^mu[-h] b^nu = h![mu=nu] for all 2^2 pairs
+[PASS] Lemma 10, h=3: a^mu[-h] b^nu = h![mu=nu] for all 3^2 pairs
+[PASS] Lemma 10, h=4: a^mu[-h] b^nu = h![mu=nu] for all 5^2 pairs
+[PASS] Lemma 10, h=5: a^mu[-h] b^nu = h![mu=nu] for all 7^2 pairs
+[PASS] Lemma 9(a), h=1: Q_s equals Q_s with the factors exchanged (Q_s = Q'_s)  (12 (mu,nu,t^sigma) cases, |sigma|<=4, |s|<=2(E+h)+2)
+[PASS] Lemma 9(b), h=1: Q_s = 0 on V_E for E+h < |s| <= 2(E+h)+2
+[PASS] Lemma 9(c), h=1: sum_s Q_s = (a[-h]b) Id on V_E
+[PASS] Lemma 9(a), h=2: Q_s equals Q_s with the factors exchanged (Q_s = Q'_s)  (48 (mu,nu,t^sigma) cases, |sigma|<=4, |s|<=2(E+h)+2)
+[PASS] Lemma 9(b), h=2: Q_s = 0 on V_E for E+h < |s| <= 2(E+h)+2
+[PASS] Lemma 9(c), h=2: sum_s Q_s = (a[-h]b) Id on V_E
+[PASS] Lemma 9(a), h=3: Q_s equals Q_s with the factors exchanged (Q_s = Q'_s)  (108 (mu,nu,t^sigma) cases, |sigma|<=4, |s|<=2(E+h)+2)
+[PASS] Lemma 9(b), h=3: Q_s = 0 on V_E for E+h < |s| <= 2(E+h)+2
+[PASS] Lemma 9(c), h=3: sum_s Q_s = (a[-h]b) Id on V_E
+[PASS] Lemma 9(a), h=4: Q_s equals Q_s with the factors exchanged (Q_s = Q'_s)  (300 (mu,nu,t^sigma) cases, |sigma|<=4, |s|<=2(E+h)+2)
+[PASS] Lemma 9(b), h=4: Q_s = 0 on V_E for E+h < |s| <= 2(E+h)+2
+[PASS] Lemma 9(c), h=4: sum_s Q_s = (a[-h]b) Id on V_E
+[PASS] crossing identity, h=1, N=p(h)=1: sum_s A_s = h![xi=nu][eta=ups] on all N^4 inputs  (0.0s)
+[PASS] crossing identity, h=2, N=p(h)=2: sum_s A_s = h![xi=nu][eta=ups] on all N^4 inputs  (0.0s)
+[PASS] crossing identity, h=3, N=p(h)=3: sum_s A_s = h![xi=nu][eta=ups] on all N^4 inputs  (0.0s)
+[PASS] crossing identity, h=4, N=p(h)=5: sum_s A_s = h![xi=nu][eta=ups] on all N^4 inputs  (0.1s)
+[PASS] crossing identity, h=5, N=p(h)=7: sum_s A_s = h![xi=nu][eta=ups] on all N^4 inputs  (71.6s)
+[PASS] display (54), row-wise factorization, h=1: equals A_s for all s and inputs
+[PASS] display (55), column-wise factorization, h=1: equals A_s for all s and inputs
+[PASS] term counts, h=1: |(54)| = R_s^row, |(55)| = R_s^col, R_s^col = R_(-s)^row
+[PASS] display (54), row-wise factorization, h=2: equals A_s for all s and inputs
+[PASS] display (55), column-wise factorization, h=2: equals A_s for all s and inputs
+[PASS] term counts, h=2: |(54)| = R_s^row, |(55)| = R_s^col, R_s^col = R_(-s)^row
+[PASS] display (54), row-wise factorization, h=3: equals A_s for all s and inputs
+[PASS] display (55), column-wise factorization, h=3: equals A_s for all s and inputs
+[PASS] term counts, h=3: |(54)| = R_s^row, |(55)| = R_s^col, R_s^col = R_(-s)^row
+[PASS] display (54), row-wise factorization, h=4: equals A_s for all s and inputs
+[PASS] display (55), column-wise factorization, h=4: equals A_s for all s and inputs
+[PASS] term counts, h=4: |(54)| = R_s^row, |(55)| = R_s^col, R_s^col = R_(-s)^row
+[PASS] bilinear identity, h=2: 2*(sum_{i<2} X_i^2)(sum_{j<2} Y_j^2) = sum_k f_k g_k as polynomials  (K = 40 products (37 with both forms nonzero), 0.0s)
+[PASS] product count, h=2: K = sum_j (4h-2j+1) p(j) = 40
+[PASS] bilinear identity, h=3: 6*(sum_{i<3} X_i^2)(sum_{j<3} Y_j^2) = sum_k f_k g_k as polynomials  (K = 120 products (117 with both forms nonzero), 0.0s)
+[PASS] product count, h=3: K = sum_j (4h-2j+1) p(j) = 120
+[PASS] bilinear identity, h=4: 24*(sum_{i<5} X_i^2)(sum_{j<5} Y_j^2) = sum_k f_k g_k as polynomials  (K = 307 products (304 with both forms nonzero), 0.0s)
+[PASS] product count, h=4: K = sum_j (4h-2j+1) p(j) = 307
+[PASS] bilinear identity, h=5: 120*(sum_{i<7} X_i^2)(sum_{j<7} Y_j^2) = sum_k f_k g_k as polynomials  (K = 707 products (704 with both forms nonzero), 0.1s)
+[PASS] product count, h=5: K = sum_j (4h-2j+1) p(j) = 707
+
+exponent of the product count K(lambda) = sum_j (4h-2j+1) p(j), h least with p(h) >= 2^lambda
+(Hrubes 2024 exponent for comparison: 1 + 2H(alpha/2) with H(alpha) = 1/2, = 1.6147)
+ lambda       h     log2 K  log2K/lambda
+     10      23       22.7        2.2715
+     20      61       38.4        1.9221
+     40     186       68.9        1.7227
+     60     372       98.5        1.6410
+     70     489      113.2        1.6178
+     80     620      127.8        1.5978
+    100     927      156.9        1.5685
+    200    3361      300.9        1.5045
+    400   12663      586.4        1.4661
+    600   27849      870.9        1.4514
+first lambda with exponent below 1.6147: 72  (sqrt 2 = 1.4142)
+[PASS] exponent table computed
+
+44/44 checks passed in 160s
+ALL CHECKS PASSED
